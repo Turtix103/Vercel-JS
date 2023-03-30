@@ -1,11 +1,46 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
-
-const inter = Inter({ subsets: ['latin'] })
+import { useState } from 'react';
+import Head from 'next/head';
+import styles from '@/styles/Home.module.css';
 
 export default function Calculator() {
+  const [text, setText] = useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [variables, setVariables] = useState({text: false, name: false, email: false});
+  const [isValid, setIsValid] = useState(false);
+
+  const validateInputs = () => {
+    const isTextValid = text.trim().length > 0;
+    const isNameValid = name.trim().length > 0;
+    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+    setIsValid(isTextValid && isNameValid && isEmailValid);
+  };
+
+  const handleValidation = () => {
+    validateInputs();
+    const textInput = document.getElementById('text-input');
+    const nameInput = document.getElementById('name-input');
+    const emailInput = document.getElementById('email-input');
+    if (!isValid) {
+      if (!text.trim()) {
+        variables.text = true;
+      }
+      if (!name.trim()) {
+        variables.name = true;
+      }
+      if (!email.trim() || !/^([a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6})*$/.test(email.trim())) {
+        variables.email = true;
+      }
+    } else {
+      textInput.className = styles.enterText;
+      nameInput.className = styles.enterText;
+      emailInput.className = styles.enterText;
+    }
+
+    setVariables({...variables})
+  };
+
   return (
     <>
       <Head>
@@ -15,109 +50,21 @@ export default function Calculator() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-        <div className={styles.description}>
-          <p>
-            Get started by editing&nbsp;
-            <code className={styles.code}>pages/index.js</code>
-          </p>
-          <div>
-            <a
-              href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              By{' '}
-              <Image
-                src="/vercel.svg"
-                alt="Vercel Logo"
-                className={styles.vercelLogo}
-                width={100}
-                height={24}
-                priority
-              />
-            </a>
-          </div>
+        <div className={styles.enterText}>
+          <text>Ulice</text>
+          <input style={variables.text ? styles.enterText : styles.errorInput} type="text" id="text-input" value={text} onChange={(e) => setText(e.target.value)} />
         </div>
-
-        <div className={styles.center}>
-          <Image
-            className={styles.logo}
-            src="/next.svg"
-            alt="Next.js Logo"
-            width={180}
-            height={37}
-            priority
-          />
-          <div className={styles.thirteen}>
-            <Image
-              src="/thirteen.svg"
-              alt="13"
-              width={40}
-              height={31}
-              priority
-            />
-          </div>
+        <div className={styles.enterText}>
+          <text>Jméno</text>
+          <input style={variables.name ? styles.enterText : styles.errorInput} type="text" id="name-input" value={name} onChange={(e) => setName(e.target.value)} />
         </div>
-
-        <div className={styles.grid}>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Docs <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Find in-depth information about Next.js features and&nbsp;API.
-            </p>
-          </a>
-
-          <a
-            href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Learn <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Learn about Next.js in an interactive course with&nbsp;quizzes!
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Templates <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Discover and deploy boilerplate example Next.js&nbsp;projects.
-            </p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <h2 className={inter.className}>
-              Deploy <span>-&gt;</span>
-            </h2>
-            <p className={inter.className}>
-              Instantly deploy your Next.js site to a shareable URL
-              with&nbsp;Vercel.
-            </p>
-          </a>
+        <div className={styles.enterText}>
+          <text>E-mail</text>
+          <input style={variables.email ? styles.enterText : styles.errorInput} type="text" id="email-input" value={email} onChange={(e) => setEmail(e.target.value)} />
         </div>
+        <button onClick={handleValidation}>Validate</button>
+        {!isValid && <p>Some inputs are invalid!</p>}
       </main>
     </>
-  )
+  );
 }
